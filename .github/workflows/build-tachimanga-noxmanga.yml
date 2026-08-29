@@ -1,0 +1,157 @@
+name: Build NoxManga PT-BR for Tachimanga
+
+on:
+  push:
+    paths:
+      - ".github/workflows/build-tachimanga-noxmanga.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "43 */6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: noxmanga-tachimanga-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Clone current Keiyoushi source
+        run: git clone --depth 1 https://github.com/keiyoushi/extensions-source.git upstream
+
+      - name: Detect NoxManga upstream changes
+        id: upstream
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+
+          repo = Path("upstream")
+          state_path = Path("tachimanga/noxmanga-upstream-state.json")
+          jar_path = Path("tachimanga/NoxManga-PT-BR-Tachimanga.jar")
+
+          def tree(path):
+              return subprocess.check_output(["git", "-C", str(repo), "rev-parse", f"HEAD:{path}"], text=True).strip()
+
+          current = {
+              "remangas": tree("src/pt/remangas"),
+              "gradle": tree("gradle"),
+              "common": tree("common"),
+              "core": tree("core"),
+              "compiler": tree("compiler"),
+          }
+          previous = {}
+          if state_path.exists():
+              try:
+                  previous = json.loads(state_path.read_text(encoding="utf-8")).get("trees", {})
+              except Exception:
+                  previous = {}
+
+          event = os.environ.get("GITHUB_EVENT_NAME", "")
+          needs_build = event == "workflow_dispatch" or current != previous or not jar_path.exists()
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write(f"needs_build={'true' if needs_build else 'false'}\n")
+          Path(".noxmanga-state.json").write_text(json.dumps({"trees": current}, indent=2) + "\n", encoding="utf-8")
+          print("NoxManga changed:", needs_build)
+          PY
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+
+      - name: Patch Keiyoushi for Tachimanga
+        if: steps.upstream.outputs.needs_build == 'true'
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path("upstream")
+          versions = root / "gradle/kei.versions.toml"
+          text = versions.read_text(encoding="utf-8")
+          text = re.sub(r'android-sdk-min\s*=\s*"\d+"', 'android-sdk-min = "21"', text, count=1)
+          versions.write_text(text, encoding="utf-8")
+
+          settings = root / "settings.gradle.kts"
+          text = settings.read_text(encoding="utf-8")
+          text = text.replace("loadAllIndividualExtensions()", "// loadAllIndividualExtensions()", 1)
+          marker = '// loadIndividualExtension("all", "mangadex")'
+          replacement = 'loadIndividualExtension("pt", "remangas")'
+          if marker in text:
+              text = text.replace(marker, replacement, 1)
+          else:
+              anchor = "// loadAllIndividualExtensions()"
+              text = text.replace(anchor, anchor + "\n" + replacement, 1)
+          settings.write_text(text, encoding="utf-8")
+
+          build = root / "src/pt/remangas/build.gradle.kts"
+          text = build.read_text(encoding="utf-8")
+          text = text.replace('name = "NoxManga"', 'name = "NoxManga PT-BR"', 1)
+          if "pkgName =" not in text:
+              text = text.replace('name = "NoxManga PT-BR"', 'name = "NoxManga PT-BR"\n    pkgName = "pt.noxmangaptbr"', 1)
+          build.write_text(text, encoding="utf-8")
+
+          task = root / "gradle/build-logic/src/main/kotlin/io/github/keiyoushi/gradle/tasks/CreateExtensionJarTask.kt"
+          text = task.read_text(encoding="utf-8")
+          marker = '            // make it forgiving like r8\n            sanitizedRules.add("-dontwarn **")'
+          replacement = '            // Tachimanga compatibility: disable bytecode optimisation.\n            sanitizedRules.add("-dontoptimize")\n            // make it forgiving like r8\n            sanitizedRules.add("-dontwarn **")'
+          if marker in text:
+              text = text.replace(marker, replacement, 1)
+          elif 'sanitizedRules.add("-dontoptimize")' not in text:
+              raise SystemExit("Could not patch standalone JAR ProGuard rules")
+          task.write_text(text, encoding="utf-8")
+          PY
+
+          if ! grep -qxF -- '-dontoptimize' upstream/common/proguard-rules.pro; then
+            printf '\n-dontoptimize\n' >> upstream/common/proguard-rules.pro
+          fi
+
+      - name: Build NoxManga JAR
+        if: steps.upstream.outputs.needs_build == 'true'
+        working-directory: upstream
+        run: |
+          chmod +x gradlew
+          ./gradlew :src:pt:remangas:assembleRelease --no-daemon --stacktrace
+
+      - name: Publish NoxManga JAR
+        if: steps.upstream.outputs.needs_build == 'true'
+        shell: bash
+        run: |
+          mkdir -p tachimanga
+          jar="$(find upstream/src/pt/remangas/build/outputs/jar/release -type f -name '*.jar' | head -n 1)"
+          if [ -z "$jar" ] || [ ! -f "$jar" ]; then
+            echo "Built NoxManga JAR not found"
+            exit 1
+          fi
+          cp "$jar" tachimanga/NoxManga-PT-BR-Tachimanga.jar
+          sha256sum tachimanga/NoxManga-PT-BR-Tachimanga.jar > tachimanga/NoxManga-PT-BR-Tachimanga.jar.sha256
+          cp .noxmanga-state.json tachimanga/noxmanga-upstream-state.json
+
+      - name: Commit generated JAR
+        if: steps.upstream.outputs.needs_build == 'true'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tachimanga/NoxManga-PT-BR-Tachimanga.jar tachimanga/NoxManga-PT-BR-Tachimanga.jar.sha256 tachimanga/noxmanga-upstream-state.json
+          if git diff --cached --quiet; then
+            echo "NoxManga JAR already current."
+            exit 0
+          fi
+          git commit -m "Update NoxManga PT-BR Tachimanga build"
+          git push
