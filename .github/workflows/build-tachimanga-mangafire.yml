@@ -230,13 +230,13 @@ jobs:
       - name: Prepare Synthetiq sources and hashes
         shell: bash
         run: |
-          mkdir -p modules/mangadex-ptbr modules/noxmanga-ptbr
+          mkdir -p modules/mangadex-ptbr modules/taiyo-ptbr
           cp -f modules/mangafire-ptbr/icon.png modules/mangadex-ptbr/icon.png
-          cp -f modules/mangafire-ptbr/icon.png modules/noxmanga-ptbr/icon.png
+          cp -f modules/mangafire-ptbr/icon.png modules/taiyo-ptbr/icon.png
 
           node --check modules/mangafire-ptbr/index.js
           node --check modules/mangadex-ptbr/index.js
-          node --check modules/noxmanga-ptbr/index.js
+          node --check modules/taiyo-ptbr/index.js
 
           python3 - <<'PY'
           from pathlib import Path
@@ -247,7 +247,7 @@ jobs:
           modules = [
               ("mangafire-ptbr", 1),
               ("mangadex-ptbr", 2),
-              ("noxmanga-ptbr", 3),
+              ("taiyo-ptbr", 3),
           ]
 
           def sha256(path: Path) -> str:
@@ -346,7 +346,7 @@ jobs:
 
           - MangaFire PT-BR — principal
           - MangaDex PT-BR — backup
-          - NoxManga PT-BR — segundo backup
+          - Taiyō PT-BR — segundo backup
 
           ## Tachimanga
 
