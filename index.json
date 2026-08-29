@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-29T17:31:10Z",
+  "generatedAt": "2026-08-29T17:48:22Z",
   "repository": {
     "id": "iceyeternal.mangafire.ptbr",
     "name": "Manga PT-BR Sources",
@@ -52,18 +52,18 @@
     {
       "contentRating": "suggestive",
       "contentType": "pageImages",
-      "familyID": "noxmanga-ptbr-v1",
+      "familyID": "taiyo-ptbr-v1",
       "icon": {
-        "path": "modules/noxmanga-ptbr/icon.png",
+        "path": "modules/taiyo-ptbr/icon.png",
         "sha256": "bcc5764becafd46793b96469a20e290dcc3cf9930ac2f71f6413c20f62a30c88"
       },
-      "id": "noxmanga-ptbr-v1",
+      "id": "taiyo-ptbr-v1",
       "language": "pt-BR",
       "manifest": {
-        "path": "modules/noxmanga-ptbr/manifest.json",
-        "sha256": "3506af6b569a5db69ab05ba30acc17dcfcc95266e7879d91cee902165804413c"
+        "path": "modules/taiyo-ptbr/manifest.json",
+        "sha256": "ea5f520871cbdbbc27d20050d00fbc7e358bda8f20de354b2123dd753bcf0c5d"
       },
-      "name": "NoxManga PT-BR",
+      "name": "Taiyō PT-BR",
       "releaseTrack": "beta",
       "status": "active",
       "version": "1.0.0",

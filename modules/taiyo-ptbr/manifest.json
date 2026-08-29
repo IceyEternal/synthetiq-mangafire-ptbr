@@ -22,12 +22,12 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/taiyo-ptbr/index.js",
-    "sha256": "PLACEHOLDER"
+    "sha256": "c4b2ee7b3e5d83ff3e86108d7f53ad9f36fe4ca4ee7667bb3bbb78e0ebd4760b"
   },
   "familyID": "taiyo-ptbr-v1",
   "icon": {
     "path": "modules/taiyo-ptbr/icon.png",
-    "sha256": "PLACEHOLDER"
+    "sha256": "bcc5764becafd46793b96469a20e290dcc3cf9930ac2f71f6413c20f62a30c88"
   },
   "id": "taiyo-ptbr-v1",
   "language": "pt-BR",

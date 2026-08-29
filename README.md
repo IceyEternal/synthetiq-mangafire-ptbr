@@ -12,7 +12,7 @@ Fontes incluídas:
 
 - MangaFire PT-BR — principal
 - MangaDex PT-BR — backup
-- NoxManga PT-BR — segundo backup
+- Taiyō PT-BR — segundo backup
 
 ## Tachimanga
 
