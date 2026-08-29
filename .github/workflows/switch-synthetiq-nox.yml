@@ -1,0 +1,45 @@
+name: Switch Synthetiq to NoxManga
+
+on:
+  push:
+    paths:
+      - ".github/workflows/switch-synthetiq-nox.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  switch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Replace Niadd Synthetiq module with NoxManga
+        shell: bash
+        run: |
+          cp modules/noxmanga-ptbr/index.js modules/niadd-ptbr/index.js
+          cp modules/mangafire-ptbr/icon.png modules/niadd-ptbr/icon.png
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          source = Path("modules/noxmanga-ptbr/manifest.json")
+          target = Path("modules/niadd-ptbr/manifest.json")
+          manifest = json.loads(source.read_text(encoding="utf-8"))
+          manifest["entry"]["path"] = "modules/niadd-ptbr/index.js"
+          manifest["icon"]["path"] = "modules/niadd-ptbr/icon.png"
+          manifest["version"] = "1.0.0"
+          target.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
+          rm -rf modules/noxmanga-ptbr
+          node --check modules/niadd-ptbr/index.js
+
+      - name: Commit Synthetiq switch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A modules/
+          git commit -m "Replace Niadd with NoxManga in Synthetiq"
+          git push
