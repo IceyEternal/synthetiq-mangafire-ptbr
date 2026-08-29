@@ -22,7 +22,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/taiyo-ptbr/index.js",
-    "sha256": "PLACEHOLDER"
+    "sha256": "b93e7b8d1398597cf6f7d296d4051ba31b924a7de53604d8964e9b90a55e915c"
   },
   "familyID": "taiyo-ptbr-v1",
   "icon": {
