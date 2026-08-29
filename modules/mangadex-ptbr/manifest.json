@@ -1,0 +1,52 @@
+{
+  "allowedHosts": [
+    "mangadex.org",
+    "*.mangadex.org",
+    "api.mangadex.org",
+    "uploads.mangadex.org",
+    "*.mangadex.network"
+  ],
+  "attribution": {
+    "author": "Community PT-BR adaptation",
+    "website": "https://mangadex.org"
+  },
+  "baseURL": "https://mangadex.org",
+  "capabilities": [
+    "popular",
+    "latest",
+    "search",
+    "details",
+    "chapters",
+    "images",
+    "imageRequest",
+    "discovery"
+  ],
+  "contentRating": "suggestive",
+  "contentType": "pageImages",
+  "contractVersion": 1,
+  "entry": {
+    "path": "modules/mangadex-ptbr/index.js",
+    "sha256": "PLACEHOLDER"
+  },
+  "familyID": "mangadex-ptbr-v1",
+  "icon": {
+    "path": "modules/mangadex-ptbr/icon.png",
+    "sha256": "PLACEHOLDER"
+  },
+  "id": "mangadex-ptbr-v1",
+  "language": "pt-BR",
+  "legacyIDs": [],
+  "limits": {
+    "cacheTTLSeconds": 300,
+    "maxConcurrentRequests": 2,
+    "maxResponseBytes": 16777216,
+    "maxScriptBytes": 524288,
+    "timeoutMilliseconds": 30000
+  },
+  "minimumAppVersion": "1.0.0",
+  "name": "MangaDex PT-BR",
+  "releaseTrack": "beta",
+  "status": "active",
+  "universalLink": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr",
+  "version": "1.0.0"
+}
