@@ -1,0 +1,43 @@
+name: Test Taiyo Synthetiq live
+
+on:
+  push:
+    paths:
+      - ".github/workflows/test-taiyo-synthetiq.yml"
+      - "modules/taiyo-ptbr/index.js"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Run Taiyo source against live site
+        shell: bash
+        run: |
+          node <<'NODE'
+          globalThis.fetchv2 = async (url, headers, method, body) => {
+            return fetch(url, {
+              method: method || "GET",
+              headers: headers || {},
+              body: body || undefined,
+              redirect: "follow",
+            });
+          };
+          require("./modules/taiyo-ptbr/index.js");
+          (async () => {
+            const search = await globalThis.searchResults("Vagabond", 1);
+            if (!search.items || !search.items.length) throw new Error("Taiyo search returned no Vagabond results");
+            console.log("search:", search.items[0].title, search.items[0].href);
+            const details = await globalThis.extractDetails(search.items[0].href);
+            console.log("details:", details.title, details.image ? "cover=ok" : "cover=missing");
+            const chapters = await globalThis.extractChapters(search.items[0].href);
+            if (!chapters.length) throw new Error("Taiyo returned no chapters");
+            console.log("chapters:", chapters.length, chapters[0].title);
+            const images = await globalThis.extractImages(chapters[0].href);
+            if (!images.length) throw new Error("Taiyo returned no chapter images");
+            console.log("images:", images.length, images[0].url);
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
