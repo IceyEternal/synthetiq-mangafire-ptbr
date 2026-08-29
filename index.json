@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-29T00:00:00Z",
+  "generatedAt": "2026-08-29T16:42:01Z",
   "repository": {
-    "id": "iceyeternal.mangafire.ptbr",
-    "name": "MangaFire PT-BR",
+    "id": "iceyeternal.manga.ptbr",
+    "name": "Manga PT-BR Sources",
     "owner": "IceyEternal",
     "homepage": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr",
     "universalLink": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr"
@@ -28,6 +28,46 @@
       "status": "active",
       "version": "1.0.0",
       "sortPriority": 1
+    },
+    {
+      "contentRating": "suggestive",
+      "contentType": "pageImages",
+      "familyID": "mangadex-ptbr-v1",
+      "icon": {
+        "path": "modules/mangadex-ptbr/icon.png",
+        "sha256": "bcc5764becafd46793b96469a20e290dcc3cf9930ac2f71f6413c20f62a30c88"
+      },
+      "id": "mangadex-ptbr-v1",
+      "language": "pt-BR",
+      "manifest": {
+        "path": "modules/mangadex-ptbr/manifest.json",
+        "sha256": "8d719c46cf23bed4cc074fb89bd6227d57a3062f1a0dabbd21fa8b247a73f29a"
+      },
+      "name": "MangaDex PT-BR",
+      "releaseTrack": "beta",
+      "status": "active",
+      "version": "1.0.0",
+      "sortPriority": 2
+    },
+    {
+      "contentRating": "suggestive",
+      "contentType": "pageImages",
+      "familyID": "niadd-ptbr-v1",
+      "icon": {
+        "path": "modules/niadd-ptbr/icon.png",
+        "sha256": "bcc5764becafd46793b96469a20e290dcc3cf9930ac2f71f6413c20f62a30c88"
+      },
+      "id": "niadd-ptbr-v1",
+      "language": "pt-BR",
+      "manifest": {
+        "path": "modules/niadd-ptbr/manifest.json",
+        "sha256": "48745b8c8953dd3b6c85a96cb01bb921bedecdb9ff0735f9a0293636673db292"
+      },
+      "name": "Niadd PT-BR",
+      "releaseTrack": "beta",
+      "status": "active",
+      "version": "1.0.0",
+      "sortPriority": 3
     }
   ]
 }

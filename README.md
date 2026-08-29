@@ -1,23 +1,21 @@
-# MangaFire PT-BR para Synthetiq Books
+# Manga PT-BR Sources
 
-Source experimental para Synthetiq Books.
+Repositório pessoal de fontes PT-BR para Synthetiq Books e builds compatíveis com Tachimanga.
 
-## Estrutura
-- `index.json`
-- `modules/mangafire-ptbr/manifest.json`
-- `modules/mangafire-ptbr/index.js`
-- `modules/mangafire-ptbr/icon.png`
+## Synthetiq Books
 
-## Alteração PT-BR
-A lista de capítulos é pedida ao MangaFire com `language=pt-br`.
+Adiciona este repositório na app:
 
-## Instalação
-1. Cria um repositório GitHub público.
-2. Coloca o conteúdo desta pasta na raiz do repositório.
-3. Na Synthetiq Books, adiciona o URL do repositório GitHub como Source Repository.
-4. Instala `MangaFire PT-BR`.
-5. Pesquisa por `The Climber` ou `Kokou no Hito`.
+`https://github.com/IceyEternal/synthetiq-mangafire-ptbr`
 
-## Estado
-Estrutura e sintaxe preparadas para Contract v1. O acesso ao MangaFire usa `pagev2`.
-Como o MangaFire usa protecção dinâmica, esta build precisa de ser testada no iPhone/iPad.
+Fontes incluídas:
+
+- MangaFire PT-BR — principal
+- MangaDex PT-BR — backup
+- Niadd PT-BR — segundo backup
+
+## Tachimanga
+
+Os JARs prontos a instalar estão na pasta `tachimanga/`.
+
+A GitHub Action verifica alterações na Keiyoushi de 6 em 6 horas e recompila automaticamente as extensões quando o upstream muda.

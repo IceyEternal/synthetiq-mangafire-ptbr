@@ -25,12 +25,12 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/niadd-ptbr/index.js",
-    "sha256": "PLACEHOLDER"
+    "sha256": "6a7d3661eb66d7c8e6f60cf9b52469865e81fee4f45438186bcc95539eceb5df"
   },
   "familyID": "niadd-ptbr-v1",
   "icon": {
     "path": "modules/niadd-ptbr/icon.png",
-    "sha256": "PLACEHOLDER"
+    "sha256": "bcc5764becafd46793b96469a20e290dcc3cf9930ac2f71f6413c20f62a30c88"
   },
   "id": "niadd-ptbr-v1",
   "language": "pt-BR",

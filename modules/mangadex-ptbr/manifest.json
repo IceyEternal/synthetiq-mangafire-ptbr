@@ -26,12 +26,12 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/mangadex-ptbr/index.js",
-    "sha256": "PLACEHOLDER"
+    "sha256": "8285e348d8c8163ae71c72fc5cb40b930cde45d6dd801769f447a76366d0640a"
   },
   "familyID": "mangadex-ptbr-v1",
   "icon": {
     "path": "modules/mangadex-ptbr/icon.png",
-    "sha256": "PLACEHOLDER"
+    "sha256": "bcc5764becafd46793b96469a20e290dcc3cf9930ac2f71f6413c20f62a30c88"
   },
   "id": "mangadex-ptbr-v1",
   "language": "pt-BR",

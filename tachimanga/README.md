@@ -1,10 +1,11 @@
-# MangaFire PT-BR para Tachimanga
+# Fontes PT-BR para Tachimanga
 
-Build baseada na extensão MangaFire atual da Keiyoushi, recompilada especificamente para compatibilidade com Tachimanga:
+Builds baseadas nas extensões atuais da Keiyoushi e recompiladas para Tachimanga:
 
-- apenas fonte `pt-BR`;
-- `minSdk = 21`;
-- otimização ProGuard/R8 desativada (`-dontoptimize`);
-- package próprio `all.mangafireptbr`, para não colidir com a extensão oficial.
+- MangaFire PT-BR — principal;
+- MangaDex PT-BR — backup;
+- Niadd PT-BR — segundo backup.
 
-Instala no Tachimanga através de Browser → Extensions → + e escolhe `MangaFire-PT-BR-Tachimanga.jar`.
+Todas usam `minSdk = 21`, têm a otimização ProGuard/R8 desativada (`-dontoptimize`) e packages próprios para não colidirem com builds oficiais.
+
+Este workflow verifica a Keiyoushi automaticamente de 6 em 6 horas. Quando o código upstream muda, recompila as três extensões e substitui os JARs deste diretório.
