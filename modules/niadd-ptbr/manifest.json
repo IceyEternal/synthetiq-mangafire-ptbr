@@ -25,7 +25,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/niadd-ptbr/index.js",
-    "sha256": "6a7d3661eb66d7c8e6f60cf9b52469865e81fee4f45438186bcc95539eceb5df"
+    "sha256": "a177128d203860fa7ce6f8f63a279ac652b0393eb7ee7e9beeb9682515a7338a"
   },
   "familyID": "niadd-ptbr-v1",
   "icon": {
@@ -47,5 +47,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr",
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

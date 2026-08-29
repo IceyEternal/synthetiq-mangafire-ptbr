@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-29T16:42:01Z",
+  "generatedAt": "2026-08-29T16:58:59Z",
   "repository": {
     "id": "iceyeternal.mangafire.ptbr",
     "name": "Manga PT-BR Sources",
@@ -61,12 +61,12 @@
       "language": "pt-BR",
       "manifest": {
         "path": "modules/niadd-ptbr/manifest.json",
-        "sha256": "48745b8c8953dd3b6c85a96cb01bb921bedecdb9ff0735f9a0293636673db292"
+        "sha256": "18069f01eccac0acff3b10e7a7c0b8623272e4f903e547266f52c2bb85d90500"
       },
       "name": "Niadd PT-BR",
       "releaseTrack": "beta",
       "status": "active",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "sortPriority": 3
     }
   ]
