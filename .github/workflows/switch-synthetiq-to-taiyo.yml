@@ -1,0 +1,47 @@
+name: Switch Synthetiq backup to Taiyo
+
+on:
+  push:
+    paths:
+      - ".github/workflows/switch-synthetiq-to-taiyo.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  switch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Replace NoxManga with Taiyo in Synthetiq build
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/workflows/build-tachimanga-mangafire.yml')
+          text = path.read_text(encoding='utf-8')
+          replacements = {
+              'mkdir -p modules/mangadex-ptbr modules/noxmanga-ptbr': 'mkdir -p modules/mangadex-ptbr modules/taiyo-ptbr',
+              'cp -f modules/mangafire-ptbr/icon.png modules/noxmanga-ptbr/icon.png': 'cp -f modules/mangafire-ptbr/icon.png modules/taiyo-ptbr/icon.png',
+              'node --check modules/noxmanga-ptbr/index.js': 'node --check modules/taiyo-ptbr/index.js',
+              '("noxmanga-ptbr", 3),': '("taiyo-ptbr", 3),',
+              '- NoxManga PT-BR — segundo backup': '- Taiyō PT-BR — segundo backup',
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f'Expected workflow text not found: {old}')
+              text = text.replace(old, new, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit workflow switch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/build-tachimanga-mangafire.yml
+          git commit -m "Use Taiyo as third Synthetiq source"
+          git push
