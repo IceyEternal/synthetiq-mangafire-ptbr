@@ -5,6 +5,7 @@ on:
     paths:
       - ".github/workflows/build-tachimanga-mangafire.yml"
       - "modules/**/index.js"
+      - "modules/**/manifest.json"
   workflow_dispatch:
   schedule:
     - cron: "17 */6 * * *"
@@ -59,6 +60,7 @@ jobs:
               "mangafire": tree("src/all/mangafire"),
               "mangadex": tree("src/all/mangadex"),
               "niadd": tree("src/all/niadd"),
+              "noxmanga": tree("src/pt/remangas"),
               "gradle": tree("gradle"),
               "common": tree("common"),
               "core": tree("core"),
@@ -111,6 +113,7 @@ jobs:
               'loadIndividualExtension("all", "mangafire")',
               'loadIndividualExtension("all", "mangadex")',
               'loadIndividualExtension("all", "niadd")',
+              'loadIndividualExtension("pt", "remangas")',
           ])
           if marker in text:
               text = text.replace(marker, replacement, 1)
@@ -153,6 +156,10 @@ jobs:
           source = '    source {\n        lang = "pt-BR"\n        baseUrl = "https://br.niadd.com"\n    }'
           path.write_text(text[:start] + source + text[end:], encoding="utf-8")
 
+          path = root / "src/pt/remangas/build.gradle.kts"
+          text = identity(path, "NoxManga", "NoxManga PT-BR", "pt.noxmangaptbr")
+          path.write_text(text, encoding="utf-8")
+
           task = root / "gradle/build-logic/src/main/kotlin/io/github/keiyoushi/gradle/tasks/CreateExtensionJarTask.kt"
           text = task.read_text(encoding="utf-8")
           marker = '            // make it forgiving like r8\n            sanitizedRules.add("-dontwarn **")'
@@ -177,6 +184,7 @@ jobs:
             :src:all:mangafire:assembleRelease \
             :src:all:mangadex:assembleRelease \
             :src:all:niadd:assembleRelease \
+            :src:pt:remangas:assembleRelease \
             --no-daemon --stacktrace
 
       - name: Publish Tachimanga JARs
@@ -186,20 +194,22 @@ jobs:
           mkdir -p tachimanga
 
           copy_jar() {
-            module="$1"
-            output="$2"
-            jar="$(find "upstream/src/all/$module/build/outputs/jar/release" -type f -name '*.jar' | head -n 1)"
+            category="$1"
+            module="$2"
+            output="$3"
+            jar="$(find "upstream/src/$category/$module/build/outputs/jar/release" -type f -name '*.jar' | head -n 1)"
             if [ -z "$jar" ] || [ ! -f "$jar" ]; then
-              echo "Built JAR not found for $module"
+              echo "Built JAR not found for $category/$module"
               exit 1
             fi
             cp "$jar" "tachimanga/$output"
             sha256sum "tachimanga/$output" > "tachimanga/$output.sha256"
           }
 
-          copy_jar mangafire MangaFire-PT-BR-Tachimanga.jar
-          copy_jar mangadex MangaDex-PT-BR-Tachimanga.jar
-          copy_jar niadd Niadd-PT-BR-Tachimanga.jar
+          copy_jar all mangafire MangaFire-PT-BR-Tachimanga.jar
+          copy_jar all mangadex MangaDex-PT-BR-Tachimanga.jar
+          copy_jar all niadd Niadd-PT-BR-Tachimanga.jar
+          copy_jar pt remangas NoxManga-PT-BR-Tachimanga.jar
           cp .upstream-state.json tachimanga/upstream-state.json
 
           cat > tachimanga/README.md <<'EOF'
@@ -209,23 +219,24 @@ jobs:
 
           - MangaFire PT-BR — principal;
           - MangaDex PT-BR — backup;
-          - Niadd PT-BR — segundo backup.
+          - Niadd PT-BR — backup adicional;
+          - NoxManga PT-BR — backup adicional.
 
           Todas usam `minSdk = 21`, têm a otimização ProGuard/R8 desativada (`-dontoptimize`) e packages próprios para não colidirem com builds oficiais.
 
-          Este workflow verifica a Keiyoushi automaticamente de 6 em 6 horas. Quando o código upstream muda, recompila as três extensões e substitui os JARs deste diretório.
+          Este workflow verifica a Keiyoushi automaticamente de 6 em 6 horas. Quando o código upstream muda, recompila as quatro extensões e substitui os JARs deste diretório.
           EOF
 
       - name: Prepare Synthetiq sources and hashes
         shell: bash
         run: |
-          mkdir -p modules/mangadex-ptbr modules/niadd-ptbr
+          mkdir -p modules/mangadex-ptbr modules/noxmanga-ptbr
           cp -f modules/mangafire-ptbr/icon.png modules/mangadex-ptbr/icon.png
-          cp -f modules/mangafire-ptbr/icon.png modules/niadd-ptbr/icon.png
+          cp -f modules/mangafire-ptbr/icon.png modules/noxmanga-ptbr/icon.png
 
           node --check modules/mangafire-ptbr/index.js
           node --check modules/mangadex-ptbr/index.js
-          node --check modules/niadd-ptbr/index.js
+          node --check modules/noxmanga-ptbr/index.js
 
           python3 - <<'PY'
           from pathlib import Path
@@ -236,7 +247,7 @@ jobs:
           modules = [
               ("mangafire-ptbr", 1),
               ("mangadex-ptbr", 2),
-              ("niadd-ptbr", 3),
+              ("noxmanga-ptbr", 3),
           ]
 
           def sha256(path: Path) -> str:
@@ -335,13 +346,18 @@ jobs:
 
           - MangaFire PT-BR — principal
           - MangaDex PT-BR — backup
-          - Niadd PT-BR — segundo backup
+          - NoxManga PT-BR — segundo backup
 
           ## Tachimanga
 
-          Os JARs prontos a instalar estão na pasta `tachimanga/`.
+          Os JARs prontos a instalar estão na pasta `tachimanga/`:
 
-          A GitHub Action verifica alterações na Keiyoushi de 6 em 6 horas e recompila automaticamente as extensões quando o upstream muda.
+          - MangaFire PT-BR
+          - MangaDex PT-BR
+          - Niadd PT-BR
+          - NoxManga PT-BR
+
+          A GitHub Action verifica alterações na Keiyoushi de 6 em 6 horas e recompila automaticamente as quatro extensões quando o upstream muda.
           EOF
 
       - name: Commit generated files
