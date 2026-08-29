@@ -61,6 +61,7 @@ jobs:
               "mangadex": tree("src/all/mangadex"),
               "niadd": tree("src/all/niadd"),
               "noxmanga": tree("src/pt/remangas"),
+              "taiyo": tree("src/pt/taiyo"),
               "gradle": tree("gradle"),
               "common": tree("common"),
               "core": tree("core"),
@@ -114,6 +115,7 @@ jobs:
               'loadIndividualExtension("all", "mangadex")',
               'loadIndividualExtension("all", "niadd")',
               'loadIndividualExtension("pt", "remangas")',
+              'loadIndividualExtension("pt", "taiyo")',
           ])
           if marker in text:
               text = text.replace(marker, replacement, 1)
@@ -160,6 +162,10 @@ jobs:
           text = identity(path, "NoxManga", "NoxManga PT-BR", "pt.noxmangaptbr")
           path.write_text(text, encoding="utf-8")
 
+          path = root / "src/pt/taiyo/build.gradle.kts"
+          text = identity(path, "Taiyō", "Taiyō PT-BR", "pt.taiyoptbr")
+          path.write_text(text, encoding="utf-8")
+
           task = root / "gradle/build-logic/src/main/kotlin/io/github/keiyoushi/gradle/tasks/CreateExtensionJarTask.kt"
           text = task.read_text(encoding="utf-8")
           marker = '            // make it forgiving like r8\n            sanitizedRules.add("-dontwarn **")'
@@ -185,9 +191,10 @@ jobs:
             :src:all:mangadex:assembleRelease \
             :src:all:niadd:assembleRelease \
             :src:pt:remangas:assembleRelease \
+            :src:pt:taiyo:assembleRelease \
             --no-daemon --stacktrace
 
-      - name: Publish Tachimanga JARs
+      - name: Publish Tachimanga JARs and repository index
         if: steps.upstream.outputs.needs_build == 'true'
         shell: bash
         run: |
@@ -210,21 +217,79 @@ jobs:
           copy_jar all mangadex MangaDex-PT-BR-Tachimanga.jar
           copy_jar all niadd Niadd-PT-BR-Tachimanga.jar
           copy_jar pt remangas NoxManga-PT-BR-Tachimanga.jar
+          copy_jar pt taiyo Taiyo-PT-BR-Tachimanga.jar
           cp .upstream-state.json tachimanga/upstream-state.json
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          root = Path("upstream")
+          out = Path("tachimanga")
+
+          builds = [
+              ("all", "mangafire", "MangaFire-PT-BR-Tachimanga.jar"),
+              ("all", "mangadex", "MangaDex-PT-BR-Tachimanga.jar"),
+              ("all", "niadd", "Niadd-PT-BR-Tachimanga.jar"),
+              ("pt", "remangas", "NoxManga-PT-BR-Tachimanga.jar"),
+              ("pt", "taiyo", "Taiyo-PT-BR-Tachimanga.jar"),
+          ]
+
+          index = []
+          for category, module, jar_name in builds:
+              info_path = root / "src" / category / module / "build" / "keiyoushi-source-info.json"
+              if not info_path.exists():
+                  raise SystemExit(f"Missing source metadata: {info_path}")
+              info = json.loads(info_path.read_text(encoding="utf-8"))
+              sources = []
+              for source in info.get("sources", []):
+                  sources.append({
+                      "name": source["name"],
+                      "lang": source["lang"],
+                      "id": str(source["id"]),
+                      "baseUrl": source.get("baseUrl", ""),
+                      "versionId": 1,
+                  })
+
+              lang = sources[0]["lang"] if len(sources) == 1 else "all"
+              index.append({
+                  "name": f"Tachiyomi: {info['name']}",
+                  "pkg": info["packageName"],
+                  "apk": jar_name,
+                  "lang": lang,
+                  "code": info["versionCode"],
+                  "version": info["versionName"],
+                  "sources": sources,
+              })
+
+          (out / "index.json").write_text(
+              json.dumps(index, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          (out / "index.min.json").write_text(
+              json.dumps(index, ensure_ascii=False, separators=(",", ":")) + "\n",
+              encoding="utf-8",
+          )
+          PY
 
           cat > tachimanga/README.md <<'EOF'
           # Fontes PT-BR para Tachimanga
 
-          Builds baseadas nas extensões atuais da Keiyoushi e recompiladas para Tachimanga:
+          Repositório Tachimanga:
+
+          `https://raw.githubusercontent.com/IceyEternal/synthetiq-mangafire-ptbr/main/tachimanga/index.min.json`
+
+          Extensões incluídas:
 
           - MangaFire PT-BR — principal;
           - MangaDex PT-BR — backup;
+          - Taiyō PT-BR — backup;
           - Niadd PT-BR — backup adicional;
           - NoxManga PT-BR — backup adicional.
 
-          Todas usam `minSdk = 21`, têm a otimização ProGuard/R8 desativada (`-dontoptimize`) e packages próprios para não colidirem com builds oficiais.
+          Os JARs são baseados nas extensões atuais da Keiyoushi, usam `minSdk = 21`, têm a otimização ProGuard/R8 desativada (`-dontoptimize`) e packages próprios para não colidirem com builds oficiais.
 
-          Este workflow verifica a Keiyoushi automaticamente de 6 em 6 horas. Quando o código upstream muda, recompila as quatro extensões e substitui os JARs deste diretório.
+          O workflow verifica a Keiyoushi automaticamente de 6 em 6 horas. Quando o código upstream muda, recompila as cinco extensões e atualiza o índice do repositório.
           EOF
 
       - name: Prepare Synthetiq sources and hashes
@@ -334,7 +399,7 @@ jobs:
           cat > README.md <<'EOF'
           # Manga PT-BR Sources
 
-          Repositório pessoal de fontes PT-BR para Synthetiq Books e builds compatíveis com Tachimanga.
+          Repositório pessoal de fontes PT-BR para Synthetiq Books e Tachimanga.
 
           ## Synthetiq Books
 
@@ -350,14 +415,19 @@ jobs:
 
           ## Tachimanga
 
-          Os JARs prontos a instalar estão na pasta `tachimanga/`:
+          Adiciona este URL como repositório de extensões:
+
+          `https://raw.githubusercontent.com/IceyEternal/synthetiq-mangafire-ptbr/main/tachimanga/index.min.json`
+
+          Extensões incluídas:
 
           - MangaFire PT-BR
           - MangaDex PT-BR
+          - Taiyō PT-BR
           - Niadd PT-BR
           - NoxManga PT-BR
 
-          A GitHub Action verifica alterações na Keiyoushi de 6 em 6 horas e recompila automaticamente as quatro extensões quando o upstream muda.
+          A GitHub Action verifica alterações na Keiyoushi de 6 em 6 horas e recompila automaticamente as cinco extensões quando o upstream muda.
           EOF
 
       - name: Commit generated files
