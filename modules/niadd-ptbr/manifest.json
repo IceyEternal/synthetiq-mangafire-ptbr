@@ -1,15 +1,16 @@
 {
   "allowedHosts": [
-    "br.niadd.com",
-    "*.niadd.com",
-    "*.yx247.com",
-    "*.mangadogs.com"
+    "noxmangas.org",
+    "www.noxmangas.org",
+    "*.noxmangas.org",
+    "picture.mangalivre.org",
+    "*.mangalivre.org"
   ],
   "attribution": {
     "author": "Community PT-BR adaptation",
-    "website": "https://br.niadd.com"
+    "website": "https://noxmangas.org"
   },
-  "baseURL": "https://br.niadd.com",
+  "baseURL": "https://noxmangas.org",
   "capabilities": [
     "popular",
     "latest",
@@ -25,14 +26,14 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/niadd-ptbr/index.js",
-    "sha256": "ca011e6eb78b1efed35cc1080a4f91b9122260b92329be56e438a9678e4911e7"
+    "sha256": "PLACEHOLDER"
   },
-  "familyID": "niadd-ptbr-v1",
+  "familyID": "noxmanga-ptbr-v1",
   "icon": {
     "path": "modules/niadd-ptbr/icon.png",
     "sha256": "bcc5764becafd46793b96469a20e290dcc3cf9930ac2f71f6413c20f62a30c88"
   },
-  "id": "niadd-ptbr-v1",
+  "id": "noxmanga-ptbr-v1",
   "language": "pt-BR",
   "legacyIDs": [],
   "limits": {
@@ -43,9 +44,9 @@
     "timeoutMilliseconds": 30000
   },
   "minimumAppVersion": "1.0.0",
-  "name": "Niadd PT-BR",
+  "name": "NoxManga PT-BR",
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr",
-  "version": "1.0.2"
+  "version": "1.0.0"
 }
