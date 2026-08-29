@@ -1,6 +1,13 @@
 {
   "schemaVersion": 1,
   "generatedAt": "2026-08-29T00:00:00Z",
+  "repository": {
+    "id": "iceyeternal.mangafire.ptbr",
+    "name": "MangaFire PT-BR",
+    "owner": "IceyEternal",
+    "homepage": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr",
+    "universalLink": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr"
+  },
   "modules": [
     {
       "contentRating": "suggestive",
@@ -14,7 +21,7 @@
       "language": "pt-BR",
       "manifest": {
         "path": "modules/mangafire-ptbr/manifest.json",
-        "sha256": "28421fe18e855367c91ac6640d401dbd06e6c2d2a54aacb3b60adc81c5b1f73a"
+        "sha256": "8ae1c31a12c9afcb47510e6eeae91db23551a2af70c9075f778a66e60fcc4543"
       },
       "name": "MangaFire PT-BR",
       "releaseTrack": "beta",
