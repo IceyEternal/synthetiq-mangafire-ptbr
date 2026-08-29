@@ -38,6 +38,7 @@
   },
   "id": "mangafire-ptbr-v1",
   "language": "pt-BR",
+  "legacyIDs": [],
   "limits": {
     "cacheTTLSeconds": 300,
     "maxConcurrentRequests": 2,
