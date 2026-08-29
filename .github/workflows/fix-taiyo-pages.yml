@@ -1,0 +1,64 @@
+name: Fix Taiyo Synthetiq pages
+
+on:
+  push:
+    paths:
+      - ".github/workflows/fix-taiyo-pages.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Patch Taiyo chapter page parsing
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('modules/taiyo-ptbr/index.js')
+          text = path.read_text(encoding='utf-8')
+          marker = '''  async function extractImages(value) {
+'''
+          helper = r'''  function serializedChapterImages(html) {
+    const normalized = String(html || "")
+      .replace(/\\\\\"/g, '"')
+      .replace(/\\\"/g, '"');
+    const markerIndex = normalized.indexOf('"mediaChapter":');
+    if (markerIndex < 0) return [];
+    const chunk = normalized.slice(markerIndex);
+    const chapterMatch = chunk.match(/"mediaChapter"\s*:\s*\{\s*"id"\s*:\s*"([^"]+)"/i);
+    const mediaMatch = chunk.match(/"media"\s*:\s*\{\s*"id"\s*:\s*"([^"]+)"/i);
+    const pagesMatch = chunk.match(/"pages"\s*:\s*\[([\s\S]*?)\]\s*,\s*"previousChapter"/i)
+      || chunk.match(/"pages"\s*:\s*\[([\s\S]*?)\]/i);
+    if (!chapterMatch || !mediaMatch || !pagesMatch) return [];
+    const pageIDs = Array.from(pagesMatch[1].matchAll(/"id"\s*:\s*"([^"]+)"/gi)).map((match) => match[1]);
+    if (!pageIDs.length) return [];
+    return pageIDs.map((pageID) => `${CDN_URL}/${mediaMatch[1]}/chapters/${chapterMatch[1]}/${pageID}.jpg`);
+  }
+
+'''
+          if 'function serializedChapterImages(html)' not in text:
+              if marker not in text:
+                  raise SystemExit('Taiyo extractImages marker not found')
+              text = text.replace(marker, helper + marker, 1)
+          old = '    if (!urls.length) urls = directChapterImages(html);'
+          new = '    if (!urls.length) urls = serializedChapterImages(html);\n    if (!urls.length) urls = directChapterImages(html);'
+          if old not in text and new not in text:
+              raise SystemExit('Taiyo direct image fallback not found')
+          if old in text:
+              text = text.replace(old, new, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+          node --check modules/taiyo-ptbr/index.js
+      - name: Commit fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add modules/taiyo-ptbr/index.js
+          git commit -m "Fix Taiyo Synthetiq chapter pages"
+          git push
