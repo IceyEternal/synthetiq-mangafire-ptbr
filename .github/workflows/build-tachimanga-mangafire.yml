@@ -41,7 +41,6 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import hashlib
           import json
           import os
           import subprocess
@@ -154,7 +153,7 @@ jobs:
           end = text.rfind("\n}")
           if start == -1 or end == -1:
               raise SystemExit("Could not isolate Niadd language block")
-          source = '    source {\n        lang = "pt-BR"\n        baseUrl = "https://br.niadd.com"\n    }\n'
+          source = '    source {\n        lang = "pt-BR"\n        baseUrl = "https://br.niadd.com"\n    }'
           path.write_text(text[:start] + source + text[end:], encoding="utf-8")
 
           # The standalone extension JAR has its own ProGuard pass. Disable
