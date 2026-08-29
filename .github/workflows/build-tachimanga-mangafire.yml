@@ -74,7 +74,7 @@ jobs:
                   previous = {}
 
           event = os.environ.get("GITHUB_EVENT_NAME", "")
-          needs_build = event != "schedule" or current != previous
+          needs_build = event == "workflow_dispatch" or current != previous
 
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               output.write(f"needs_build={'true' if needs_build else 'false'}\n")
@@ -126,7 +126,6 @@ jobs:
                   text = text.replace(f'name = "{new_name}"', f'name = "{new_name}"\n    pkgName = "{pkg}"', 1)
               return text
 
-          # MangaFire: keep only the Brazilian Portuguese source.
           path = root / "src/all/mangafire/build.gradle.kts"
           text = identity(path, "MangaFire", "MangaFire PT-BR", "all.mangafireptbr")
           start = text.find("    listOf(")
@@ -136,7 +135,6 @@ jobs:
           source = '    source {\n        lang = "pt-BR"\n        baseUrl = "https://mangafire.to"\n    }\n\n'
           path.write_text(text[:start] + source + text[end:], encoding="utf-8")
 
-          # MangaDex: keep only PT-BR while preserving deeplinks/dependencies.
           path = root / "src/all/mangadex/build.gradle.kts"
           text = identity(path, "MangaDex", "MangaDex PT-BR", "all.mangadexptbr")
           start = text.find("    listOf(")
@@ -146,7 +144,6 @@ jobs:
           source = '    source {\n        lang = "pt-BR"\n        baseUrl = "https://mangadex.org"\n    }\n\n'
           path.write_text(text[:start] + source + text[end:], encoding="utf-8")
 
-          # Niadd: keep only br.niadd.com.
           path = root / "src/all/niadd/build.gradle.kts"
           text = identity(path, "Niadd", "Niadd PT-BR", "all.niaddptbr")
           start = text.find("    val subdomains = mapOf(")
@@ -156,8 +153,6 @@ jobs:
           source = '    source {\n        lang = "pt-BR"\n        baseUrl = "https://br.niadd.com"\n    }'
           path.write_text(text[:start] + source + text[end:], encoding="utf-8")
 
-          # The standalone extension JAR has its own ProGuard pass. Disable
-          # bytecode optimisation, which is the part Tachimanga's JVM rejects.
           task = root / "gradle/build-logic/src/main/kotlin/io/github/keiyoushi/gradle/tasks/CreateExtensionJarTask.kt"
           text = task.read_text(encoding="utf-8")
           marker = '            // make it forgiving like r8\n            sanitizedRules.add("-dontwarn **")'
@@ -311,7 +306,7 @@ jobs:
               "schemaVersion": 1,
               "generatedAt": generated_at,
               "repository": {
-                  "id": "iceyeternal.manga.ptbr",
+                  "id": "iceyeternal.mangafire.ptbr",
                   "name": "Manga PT-BR Sources",
                   "owner": "IceyEternal",
                   "homepage": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr",
