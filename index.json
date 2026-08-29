@@ -21,7 +21,7 @@
       "language": "pt-BR",
       "manifest": {
         "path": "modules/mangafire-ptbr/manifest.json",
-        "sha256": "8ae1c31a12c9afcb47510e6eeae91db23551a2af70c9075f778a66e60fcc4543"
+        "sha256": "765e579459218276f94949b9b69ec702976737b0ba2ed42903251727028a6fa9"
       },
       "name": "MangaFire PT-BR",
       "releaseTrack": "beta",
