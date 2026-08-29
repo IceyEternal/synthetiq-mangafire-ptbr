@@ -22,7 +22,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/taiyo-ptbr/index.js",
-    "sha256": "c4b2ee7b3e5d83ff3e86108d7f53ad9f36fe4ca4ee7667bb3bbb78e0ebd4760b"
+    "sha256": "PLACEHOLDER"
   },
   "familyID": "taiyo-ptbr-v1",
   "icon": {
@@ -44,5 +44,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr",
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
