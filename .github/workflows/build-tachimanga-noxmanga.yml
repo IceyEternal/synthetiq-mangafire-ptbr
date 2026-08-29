@@ -154,4 +154,6 @@ jobs:
             exit 0
           fi
           git commit -m "Update NoxManga PT-BR Tachimanga build"
-          git push
+          git fetch origin main
+          git rebase origin/main
+          git push origin main
