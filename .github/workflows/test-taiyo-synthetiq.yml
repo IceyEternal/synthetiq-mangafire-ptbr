@@ -25,6 +25,7 @@ jobs:
           };
           require("./modules/taiyo-ptbr/index.js");
           (async () => {
+            console.log("Taiyo live retest with serialized chapter parser");
             const search = await globalThis.searchResults("Vagabond", 1);
             if (!search.items || !search.items.length) throw new Error("Taiyo search returned no Vagabond results");
             console.log("search:", search.items[0].title, search.items[0].href);
@@ -33,20 +34,9 @@ jobs:
             const chapters = await globalThis.extractChapters(search.items[0].href);
             if (!chapters.length) throw new Error("Taiyo returned no chapters");
             console.log("chapters:", chapters.length, chapters[0].title, chapters[0].href);
-            try {
-              const images = await globalThis.extractImages(chapters[0].href);
-              if (!images.length) throw new Error("Taiyo returned no chapter images");
-              console.log("images:", images.length, images[0].url);
-            } catch (error) {
-              const html = await (await fetch(chapters[0].href)).text();
-              console.log("chapter html length:", html.length);
-              for (const needle of ["mediaChapter", "pages", "cdn.taiyo.moe", "chapterObj"]) {
-                const index = html.indexOf(needle);
-                console.log("needle", needle, "index", index);
-                if (index >= 0) console.log(html.slice(Math.max(0, index - 800), index + 3000));
-              }
-              throw error;
-            }
+            const images = await globalThis.extractImages(chapters[0].href);
+            if (!images.length) throw new Error("Taiyo returned no chapter images");
+            console.log("images:", images.length, images[0].url);
           })().catch((error) => {
             console.error(error);
             process.exit(1);
