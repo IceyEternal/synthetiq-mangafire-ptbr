@@ -1,21 +1,28 @@
-name: Build MangaFire PT-BR for Tachimanga
+name: Build PT-BR manga sources
 
 on:
   push:
     paths:
       - ".github/workflows/build-tachimanga-mangafire.yml"
+      - "modules/**/index.js"
   workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
 
 permissions:
   contents: write
+
+concurrency:
+  group: ptbr-manga-source-build
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout this repository
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
       - name: Set up Java 17
         uses: actions/setup-java@v5
@@ -26,90 +33,332 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Clone current Keiyoushi extension source
+      - name: Clone current Keiyoushi source
         run: git clone --depth 1 https://github.com/keiyoushi/extensions-source.git upstream
 
-      - name: Patch MangaFire for Tachimanga and PT-BR
+      - name: Detect Keiyoushi changes
+        id: upstream
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          repo = Path("upstream")
+          state_path = Path("tachimanga/upstream-state.json")
+
+          def tree(path):
+              return subprocess.check_output(
+                  ["git", "-C", str(repo), "rev-parse", f"HEAD:{path}"],
+                  text=True,
+              ).strip()
+
+          current = {
+              "mangafire": tree("src/all/mangafire"),
+              "mangadex": tree("src/all/mangadex"),
+              "niadd": tree("src/all/niadd"),
+              "gradle": tree("gradle"),
+              "common": tree("common"),
+              "core": tree("core"),
+              "compiler": tree("compiler"),
+              "i18n": tree("lib/i18n"),
+          }
+
+          previous = {}
+          if state_path.exists():
+              try:
+                  previous = json.loads(state_path.read_text(encoding="utf-8")).get("trees", {})
+              except Exception:
+                  previous = {}
+
+          event = os.environ.get("GITHUB_EVENT_NAME", "")
+          needs_build = event != "schedule" or current != previous
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"needs_build={'true' if needs_build else 'false'}\n")
+
+          Path(".upstream-state.json").write_text(
+              json.dumps({"trees": current}, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print("Keiyoushi changed:", needs_build)
+          PY
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+
+      - name: Patch Keiyoushi for Tachimanga PT-BR
+        if: steps.upstream.outputs.needs_build == 'true'
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
 
           root = Path("upstream")
 
-          # Tachimanga explicitly recommends minSdk 21 for manually built extensions.
           versions = root / "gradle/kei.versions.toml"
-          text = versions.read_text()
-          text = text.replace('android-sdk-min = "26"', 'android-sdk-min = "21"')
-          versions.write_text(text)
+          text = versions.read_text(encoding="utf-8")
+          text = re.sub(r'android-sdk-min\s*=\s*"\d+"', 'android-sdk-min = "21"', text, count=1)
+          versions.write_text(text, encoding="utf-8")
 
-          # Only configure the MangaFire module so CI does not load every extension.
           settings = root / "settings.gradle.kts"
-          text = settings.read_text()
-          old = 'loadAllIndividualExtensions()\n// loadIndividualExtension("all", "mangadex")'
-          new = '// loadAllIndividualExtensions()\nloadIndividualExtension("all", "mangafire")'
-          if old not in text:
-              raise SystemExit("Could not patch settings.gradle.kts")
-          settings.write_text(text.replace(old, new, 1))
+          text = settings.read_text(encoding="utf-8")
+          text = text.replace("loadAllIndividualExtensions()", "// loadAllIndividualExtensions()", 1)
+          marker = '// loadIndividualExtension("all", "mangadex")'
+          replacement = '\n'.join([
+              'loadIndividualExtension("all", "mangafire")',
+              'loadIndividualExtension("all", "mangadex")',
+              'loadIndividualExtension("all", "niadd")',
+          ])
+          if marker in text:
+              text = text.replace(marker, replacement, 1)
+          else:
+              anchor = "// loadAllIndividualExtensions()"
+              text = text.replace(anchor, anchor + "\n" + replacement, 1)
+          settings.write_text(text, encoding="utf-8")
 
-          # Make this a separate PT-BR-only package, so it can coexist with the official build.
-          build = root / "src/all/mangafire/build.gradle.kts"
-          text = build.read_text()
-          text = text.replace('name = "MangaFire"', 'name = "MangaFire PT-BR"', 1)
-          text = text.replace('versionCode = 32', 'versionCode = 3201', 1)
-          text = text.replace('contentWarning = ContentWarning.MIXED', 'pkgName = "all.mangafireptbr"\n    contentWarning = ContentWarning.MIXED', 1)
-          text = text.replace('listOf("en", "es", "es-419", "fr", "ja", "pt", "pt-BR").forEach {', 'listOf("pt-BR").forEach {', 1)
-          build.write_text(text)
+          def identity(path, old_name, new_name, pkg):
+              text = path.read_text(encoding="utf-8")
+              text = text.replace(f'name = "{old_name}"', f'name = "{new_name}"', 1)
+              if "pkgName =" not in text:
+                  text = text.replace(f'name = "{new_name}"', f'name = "{new_name}"\n    pkgName = "{pkg}"', 1)
+              return text
 
-          # Guarantee that the standalone extension JAR's ProGuard pass does not optimize bytecode.
+          # MangaFire: keep only the Brazilian Portuguese source.
+          path = root / "src/all/mangafire/build.gradle.kts"
+          text = identity(path, "MangaFire", "MangaFire PT-BR", "all.mangafireptbr")
+          start = text.find("    listOf(")
+          end = text.find("    deeplink {", start)
+          if start == -1 or end == -1:
+              raise SystemExit("Could not isolate MangaFire language block")
+          source = '    source {\n        lang = "pt-BR"\n        baseUrl = "https://mangafire.to"\n    }\n\n'
+          path.write_text(text[:start] + source + text[end:], encoding="utf-8")
+
+          # MangaDex: keep only PT-BR while preserving deeplinks/dependencies.
+          path = root / "src/all/mangadex/build.gradle.kts"
+          text = identity(path, "MangaDex", "MangaDex PT-BR", "all.mangadexptbr")
+          start = text.find("    listOf(")
+          end = text.find("    deeplink {", start)
+          if start == -1 or end == -1:
+              raise SystemExit("Could not isolate MangaDex language block")
+          source = '    source {\n        lang = "pt-BR"\n        baseUrl = "https://mangadex.org"\n    }\n\n'
+          path.write_text(text[:start] + source + text[end:], encoding="utf-8")
+
+          # Niadd: keep only br.niadd.com.
+          path = root / "src/all/niadd/build.gradle.kts"
+          text = identity(path, "Niadd", "Niadd PT-BR", "all.niaddptbr")
+          start = text.find("    val subdomains = mapOf(")
+          end = text.rfind("\n}")
+          if start == -1 or end == -1:
+              raise SystemExit("Could not isolate Niadd language block")
+          source = '    source {\n        lang = "pt-BR"\n        baseUrl = "https://br.niadd.com"\n    }\n'
+          path.write_text(text[:start] + source + text[end:], encoding="utf-8")
+
+          # The standalone extension JAR has its own ProGuard pass. Disable
+          # bytecode optimisation, which is the part Tachimanga's JVM rejects.
           task = root / "gradle/build-logic/src/main/kotlin/io/github/keiyoushi/gradle/tasks/CreateExtensionJarTask.kt"
-          text = task.read_text()
+          text = task.read_text(encoding="utf-8")
           marker = '            // make it forgiving like r8\n            sanitizedRules.add("-dontwarn **")'
-          replacement = '            // Tachimanga compatibility: keep shrinking/obfuscation, but disable bytecode optimization.\n            sanitizedRules.add("-dontoptimize")\n            // make it forgiving like r8\n            sanitizedRules.add("-dontwarn **")'
-          if marker not in text:
-              raise SystemExit("Could not patch CreateExtensionJarTask.kt")
-          task.write_text(text.replace(marker, replacement, 1))
+          replacement = '            // Tachimanga compatibility: disable bytecode optimisation.\n            sanitizedRules.add("-dontoptimize")\n            // make it forgiving like r8\n            sanitizedRules.add("-dontwarn **")'
+          if marker in text:
+              text = text.replace(marker, replacement, 1)
+          elif 'sanitizedRules.add("-dontoptimize")' not in text:
+              raise SystemExit("Could not patch standalone JAR ProGuard rules")
+          task.write_text(text, encoding="utf-8")
           PY
 
-          # Also disable R8/ProGuard optimization in the Android release configuration itself.
           if ! grep -qxF -- '-dontoptimize' upstream/common/proguard-rules.pro; then
             printf '\n-dontoptimize\n' >> upstream/common/proguard-rules.pro
           fi
 
-      - name: Build MangaFire PT-BR extension JAR
+      - name: Build Tachimanga JARs
+        if: steps.upstream.outputs.needs_build == 'true'
         working-directory: upstream
         run: |
           chmod +x gradlew
-          ./gradlew :src:all:mangafire:assembleRelease --no-daemon --stacktrace
+          ./gradlew \
+            :src:all:mangafire:assembleRelease \
+            :src:all:mangadex:assembleRelease \
+            :src:all:niadd:assembleRelease \
+            --no-daemon --stacktrace
 
-      - name: Publish Tachimanga JAR into this repository
+      - name: Publish Tachimanga JARs
+        if: steps.upstream.outputs.needs_build == 'true'
         shell: bash
         run: |
-          JAR="$(find upstream/src/all/mangafire/build/outputs/jar/release -type f -name '*.jar' | head -n 1)"
-          if [ -z "$JAR" ] || [ ! -f "$JAR" ]; then
-            echo "Built JAR not found"
-            exit 1
-          fi
-
           mkdir -p tachimanga
-          cp "$JAR" tachimanga/MangaFire-PT-BR-Tachimanga.jar
-          sha256sum tachimanga/MangaFire-PT-BR-Tachimanga.jar > tachimanga/MangaFire-PT-BR-Tachimanga.jar.sha256
+
+          copy_jar() {
+            module="$1"
+            output="$2"
+            jar="$(find "upstream/src/all/$module/build/outputs/jar/release" -type f -name '*.jar' | head -n 1)"
+            if [ -z "$jar" ] || [ ! -f "$jar" ]; then
+              echo "Built JAR not found for $module"
+              exit 1
+            fi
+            cp "$jar" "tachimanga/$output"
+            sha256sum "tachimanga/$output" > "tachimanga/$output.sha256"
+          }
+
+          copy_jar mangafire MangaFire-PT-BR-Tachimanga.jar
+          copy_jar mangadex MangaDex-PT-BR-Tachimanga.jar
+          copy_jar niadd Niadd-PT-BR-Tachimanga.jar
+          cp .upstream-state.json tachimanga/upstream-state.json
 
           cat > tachimanga/README.md <<'EOF'
-          # MangaFire PT-BR para Tachimanga
+          # Fontes PT-BR para Tachimanga
 
-          Build baseada na extensão MangaFire atual da Keiyoushi, recompilada especificamente para compatibilidade com Tachimanga:
+          Builds baseadas nas extensões atuais da Keiyoushi e recompiladas para Tachimanga:
 
-          - apenas fonte `pt-BR`;
-          - `minSdk = 21`;
-          - otimização ProGuard/R8 desativada (`-dontoptimize`);
-          - package próprio `all.mangafireptbr`, para não colidir com a extensão oficial.
+          - MangaFire PT-BR — principal;
+          - MangaDex PT-BR — backup;
+          - Niadd PT-BR — segundo backup.
 
-          Instala no Tachimanga através de Browser → Extensions → + e escolhe `MangaFire-PT-BR-Tachimanga.jar`.
+          Todas usam `minSdk = 21`, têm a otimização ProGuard/R8 desativada (`-dontoptimize`) e packages próprios para não colidirem com builds oficiais.
+
+          Este workflow verifica a Keiyoushi automaticamente de 6 em 6 horas. Quando o código upstream muda, recompila as três extensões e substitui os JARs deste diretório.
           EOF
 
+      - name: Prepare Synthetiq sources and hashes
+        shell: bash
+        run: |
+          mkdir -p modules/mangadex-ptbr modules/niadd-ptbr
+          cp -f modules/mangafire-ptbr/icon.png modules/mangadex-ptbr/icon.png
+          cp -f modules/mangafire-ptbr/icon.png modules/niadd-ptbr/icon.png
+
+          node --check modules/mangafire-ptbr/index.js
+          node --check modules/mangadex-ptbr/index.js
+          node --check modules/niadd-ptbr/index.js
+
+          python3 - <<'PY'
+          from pathlib import Path
+          from datetime import datetime, timezone
+          import hashlib
+          import json
+
+          modules = [
+              ("mangafire-ptbr", 1),
+              ("mangadex-ptbr", 2),
+              ("niadd-ptbr", 3),
+          ]
+
+          def sha256(path: Path) -> str:
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          def bump_patch(version: str) -> str:
+              parts = str(version or "1.0.0").split(".")
+              while len(parts) < 3:
+                  parts.append("0")
+              try:
+                  parts[2] = str(int(parts[2]) + 1)
+              except ValueError:
+                  return "1.0.1"
+              return ".".join(parts[:3])
+
+          index_modules = []
+          changed_module_metadata = False
+
+          for folder, priority in modules:
+              base = Path("modules") / folder
+              entry_path = base / "index.js"
+              manifest_path = base / "manifest.json"
+              icon_path = base / "icon.png"
+              manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+              old_entry_hash = str(manifest.get("entry", {}).get("sha256", ""))
+              new_entry_hash = sha256(entry_path)
+              if old_entry_hash not in ("", "PLACEHOLDER", new_entry_hash):
+                  manifest["version"] = bump_patch(manifest.get("version", "1.0.0"))
+                  changed_module_metadata = True
+
+              manifest["entry"]["sha256"] = new_entry_hash
+              manifest["icon"]["sha256"] = sha256(icon_path)
+              manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+              index_modules.append({
+                  "contentRating": manifest["contentRating"],
+                  "contentType": manifest["contentType"],
+                  "familyID": manifest["familyID"],
+                  "icon": manifest["icon"],
+                  "id": manifest["id"],
+                  "language": manifest["language"],
+                  "manifest": {
+                      "path": str(manifest_path).replace("\\", "/"),
+                      "sha256": sha256(manifest_path),
+                  },
+                  "name": manifest["name"],
+                  "releaseTrack": manifest["releaseTrack"],
+                  "status": manifest["status"],
+                  "version": manifest["version"],
+                  "sortPriority": priority,
+              })
+
+          index_path = Path("index.json")
+          old_index = {}
+          if index_path.exists():
+              try:
+                  old_index = json.loads(index_path.read_text(encoding="utf-8"))
+              except Exception:
+                  old_index = {}
+
+          generated_at = old_index.get("generatedAt", "2026-08-29T00:00:00Z")
+          if old_index.get("modules") != index_modules or changed_module_metadata:
+              generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+          index = {
+              "schemaVersion": 1,
+              "generatedAt": generated_at,
+              "repository": {
+                  "id": "iceyeternal.manga.ptbr",
+                  "name": "Manga PT-BR Sources",
+                  "owner": "IceyEternal",
+                  "homepage": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr",
+                  "universalLink": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr",
+              },
+              "modules": index_modules,
+          }
+          index_path.write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
+
+      - name: Update repository README
+        shell: bash
+        run: |
+          cat > README.md <<'EOF'
+          # Manga PT-BR Sources
+
+          Repositório pessoal de fontes PT-BR para Synthetiq Books e builds compatíveis com Tachimanga.
+
+          ## Synthetiq Books
+
+          Adiciona este repositório na app:
+
+          `https://github.com/IceyEternal/synthetiq-mangafire-ptbr`
+
+          Fontes incluídas:
+
+          - MangaFire PT-BR — principal
+          - MangaDex PT-BR — backup
+          - Niadd PT-BR — segundo backup
+
+          ## Tachimanga
+
+          Os JARs prontos a instalar estão na pasta `tachimanga/`.
+
+          A GitHub Action verifica alterações na Keiyoushi de 6 em 6 horas e recompila automaticamente as extensões quando o upstream muda.
+          EOF
+
+      - name: Commit generated files
+        shell: bash
+        run: |
+          if git diff --quiet && [ -z "$(git status --porcelain --untracked-files=all)" ]; then
+            echo "Everything is already up to date."
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tachimanga/
-          git commit -m "Add Tachimanga-compatible MangaFire PT-BR jar" || exit 0
+          git add README.md index.json modules/ tachimanga/
+          git commit -m "Sync PT-BR manga sources"
           git push
