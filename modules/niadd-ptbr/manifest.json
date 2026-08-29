@@ -1,0 +1,51 @@
+{
+  "allowedHosts": [
+    "br.niadd.com",
+    "*.niadd.com",
+    "*.yx247.com",
+    "*.mangadogs.com"
+  ],
+  "attribution": {
+    "author": "Community PT-BR adaptation",
+    "website": "https://br.niadd.com"
+  },
+  "baseURL": "https://br.niadd.com",
+  "capabilities": [
+    "popular",
+    "latest",
+    "search",
+    "details",
+    "chapters",
+    "images",
+    "imageRequest",
+    "discovery"
+  ],
+  "contentRating": "suggestive",
+  "contentType": "pageImages",
+  "contractVersion": 1,
+  "entry": {
+    "path": "modules/niadd-ptbr/index.js",
+    "sha256": "PLACEHOLDER"
+  },
+  "familyID": "niadd-ptbr-v1",
+  "icon": {
+    "path": "modules/niadd-ptbr/icon.png",
+    "sha256": "PLACEHOLDER"
+  },
+  "id": "niadd-ptbr-v1",
+  "language": "pt-BR",
+  "legacyIDs": [],
+  "limits": {
+    "cacheTTLSeconds": 300,
+    "maxConcurrentRequests": 2,
+    "maxResponseBytes": 16777216,
+    "maxScriptBytes": 524288,
+    "timeoutMilliseconds": 30000
+  },
+  "minimumAppVersion": "1.0.0",
+  "name": "Niadd PT-BR",
+  "releaseTrack": "beta",
+  "status": "active",
+  "universalLink": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr",
+  "version": "1.0.0"
+}
