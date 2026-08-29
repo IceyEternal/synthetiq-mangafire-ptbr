@@ -1,0 +1,53 @@
+{
+  "allowedHosts": [
+    "mangafire.to",
+    "*.mangafire.to",
+    "mfcdn.nl",
+    "*.mfcdn.nl",
+    "*.mfcdn1.xyz",
+    "*.mfcdn2.xyz",
+    "*.mfcdn3.xyz"
+  ],
+  "attribution": {
+    "author": "Community PT-BR adaptation",
+    "website": "https://mangafire.to"
+  },
+  "baseURL": "https://mangafire.to",
+  "capabilities": [
+    "popular",
+    "latest",
+    "search",
+    "tags",
+    "details",
+    "chapters",
+    "images",
+    "discovery",
+    "interactivePage"
+  ],
+  "contentRating": "suggestive",
+  "contentType": "pageImages",
+  "contractVersion": 1,
+  "entry": {
+    "path": "modules/mangafire-ptbr/index.js",
+    "sha256": "b37febc3ed0e13ac7a6116b8d29a37c59257da6b2faf0fea1613b5da30b47e7e"
+  },
+  "familyID": "mangafire-ptbr-v1",
+  "icon": {
+    "path": "modules/mangafire-ptbr/icon.png",
+    "sha256": "bcc5764becafd46793b96469a20e290dcc3cf9930ac2f71f6413c20f62a30c88"
+  },
+  "id": "mangafire-ptbr-v1",
+  "language": "pt-BR",
+  "limits": {
+    "cacheTTLSeconds": 300,
+    "maxConcurrentRequests": 2,
+    "maxResponseBytes": 16777216,
+    "maxScriptBytes": 524288,
+    "timeoutMilliseconds": 30000
+  },
+  "minimumAppVersion": "1.0.0",
+  "name": "MangaFire PT-BR",
+  "releaseTrack": "beta",
+  "status": "active",
+  "version": "1.0.0"
+}
