@@ -1,0 +1,48 @@
+{
+  "allowedHosts": [
+    "taiyo.moe",
+    "*.taiyo.moe"
+  ],
+  "attribution": {
+    "author": "Community PT-BR adaptation",
+    "website": "https://taiyo.moe"
+  },
+  "baseURL": "https://taiyo.moe",
+  "capabilities": [
+    "popular",
+    "search",
+    "details",
+    "chapters",
+    "images",
+    "imageRequest",
+    "discovery"
+  ],
+  "contentRating": "suggestive",
+  "contentType": "pageImages",
+  "contractVersion": 1,
+  "entry": {
+    "path": "modules/taiyo-ptbr/index.js",
+    "sha256": "PLACEHOLDER"
+  },
+  "familyID": "taiyo-ptbr-v1",
+  "icon": {
+    "path": "modules/taiyo-ptbr/icon.png",
+    "sha256": "PLACEHOLDER"
+  },
+  "id": "taiyo-ptbr-v1",
+  "language": "pt-BR",
+  "legacyIDs": [],
+  "limits": {
+    "cacheTTLSeconds": 300,
+    "maxConcurrentRequests": 2,
+    "maxResponseBytes": 16777216,
+    "maxScriptBytes": 524288,
+    "timeoutMilliseconds": 30000
+  },
+  "minimumAppVersion": "1.0.0",
+  "name": "Taiyō PT-BR",
+  "releaseTrack": "beta",
+  "status": "active",
+  "universalLink": "https://github.com/IceyEternal/synthetiq-mangafire-ptbr",
+  "version": "1.0.0"
+}
