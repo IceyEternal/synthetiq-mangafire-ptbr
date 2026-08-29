@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-29T17:07:10Z",
+  "generatedAt": "2026-08-29T17:19:23Z",
   "repository": {
     "id": "iceyeternal.mangafire.ptbr",
     "name": "Manga PT-BR Sources",
@@ -52,21 +52,21 @@
     {
       "contentRating": "suggestive",
       "contentType": "pageImages",
-      "familyID": "niadd-ptbr-v1",
+      "familyID": "noxmanga-ptbr-v1",
       "icon": {
         "path": "modules/niadd-ptbr/icon.png",
         "sha256": "bcc5764becafd46793b96469a20e290dcc3cf9930ac2f71f6413c20f62a30c88"
       },
-      "id": "niadd-ptbr-v1",
+      "id": "noxmanga-ptbr-v1",
       "language": "pt-BR",
       "manifest": {
         "path": "modules/niadd-ptbr/manifest.json",
-        "sha256": "e20a48d4952527a25edcf2e690377d35166575f77e3d375389223d4a91f4588c"
+        "sha256": "a0f42942587ede28f0c09887faa35c1a313cd6cededc09060a6e92afc41d7031"
       },
-      "name": "Niadd PT-BR",
+      "name": "NoxManga PT-BR",
       "releaseTrack": "beta",
       "status": "active",
-      "version": "1.0.2",
+      "version": "1.0.0",
       "sortPriority": 3
     }
   ]
