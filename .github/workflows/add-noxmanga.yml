@@ -1,0 +1,98 @@
+name: Add NoxManga PT-BR
+
+on:
+  push:
+    paths:
+      - ".github/workflows/add-noxmanga.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Patch main PT-BR workflow
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/workflows/build-tachimanga-mangafire.yml')
+          text = path.read_text(encoding='utf-8')
+
+          replacements = [
+              (
+                  '              "niadd": tree("src/all/niadd"),\n',
+                  '              "niadd": tree("src/all/niadd"),\n              "remangas": tree("src/pt/remangas"),\n',
+              ),
+              (
+                  '              \'loadIndividualExtension("all", "niadd")\',\n',
+                  '              \'loadIndividualExtension("all", "niadd")\',\n              \'loadIndividualExtension("pt", "remangas")\',\n',
+              ),
+              (
+                  '          task = root / "gradle/build-logic/src/main/kotlin/io/github/keiyoushi/gradle/tasks/CreateExtensionJarTask.kt"\n',
+                  '          path = root / "src/pt/remangas/build.gradle.kts"\n          text = identity(path, "NoxManga", "NoxManga PT-BR", "pt.noxmangaptbr")\n          path.write_text(text, encoding="utf-8")\n\n          task = root / "gradle/build-logic/src/main/kotlin/io/github/keiyoushi/gradle/tasks/CreateExtensionJarTask.kt"\n',
+              ),
+              (
+                  '            :src:all:niadd:assembleRelease \\\n',
+                  '            :src:all:niadd:assembleRelease \\\n            :src:pt:remangas:assembleRelease \\\n',
+              ),
+              (
+                  '          copy_jar niadd Niadd-PT-BR-Tachimanga.jar\n',
+                  '          copy_jar niadd Niadd-PT-BR-Tachimanga.jar\n\n          noxjar="$(find "upstream/src/pt/remangas/build/outputs/jar/release" -type f -name \'*.jar\' | head -n 1)"\n          if [ -z "$noxjar" ] || [ ! -f "$noxjar" ]; then\n            echo "Built JAR not found for NoxManga"\n            exit 1\n          fi\n          cp "$noxjar" "tachimanga/NoxManga-PT-BR-Tachimanga.jar"\n          sha256sum "tachimanga/NoxManga-PT-BR-Tachimanga.jar" > "tachimanga/NoxManga-PT-BR-Tachimanga.jar.sha256"\n',
+              ),
+              (
+                  '          - Niadd PT-BR — segundo backup.\n',
+                  '          - Niadd PT-BR — segundo backup;\n          - NoxManga PT-BR — quarto source PT-BR.\n',
+              ),
+              (
+                  '          Este workflow verifica a Keiyoushi automaticamente de 6 em 6 horas. Quando o código upstream muda, recompila as três extensões e substitui os JARs deste diretório.\n',
+                  '          Este workflow verifica a Keiyoushi automaticamente de 6 em 6 horas. Quando o código upstream muda, recompila as quatro extensões e substitui os JARs deste diretório.\n',
+              ),
+              (
+                  '          mkdir -p modules/mangadex-ptbr modules/niadd-ptbr\n',
+                  '          mkdir -p modules/mangadex-ptbr modules/niadd-ptbr modules/noxmanga-ptbr\n',
+              ),
+              (
+                  '          cp -f modules/mangafire-ptbr/icon.png modules/niadd-ptbr/icon.png\n',
+                  '          cp -f modules/mangafire-ptbr/icon.png modules/niadd-ptbr/icon.png\n          cp -f modules/mangafire-ptbr/icon.png modules/noxmanga-ptbr/icon.png\n',
+              ),
+              (
+                  '          node --check modules/niadd-ptbr/index.js\n',
+                  '          node --check modules/niadd-ptbr/index.js\n          node --check modules/noxmanga-ptbr/index.js\n',
+              ),
+              (
+                  '              ("niadd-ptbr", 3),\n',
+                  '              ("noxmanga-ptbr", 3),\n',
+              ),
+              (
+                  '          - Niadd PT-BR — segundo backup\n',
+                  '          - NoxManga PT-BR — segundo backup\n',
+              ),
+          ]
+
+          for old, new in replacements:
+              if old in text:
+                  text = text.replace(old, new, 1)
+              elif new not in text:
+                  raise SystemExit(f'Expected workflow fragment not found: {old[:80]!r}')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit patched automation
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/build-tachimanga-mangafire.yml
+          if git diff --cached --quiet; then
+            echo "Main workflow already patched."
+            exit 0
+          fi
+          git commit -m "Add NoxManga PT-BR to automated builds"
+          git push
