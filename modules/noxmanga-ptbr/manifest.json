@@ -24,12 +24,12 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/noxmanga-ptbr/index.js",
-    "sha256": "PLACEHOLDER"
+    "sha256": "ef29993e9b0b866610eb6eff5e010c5fe6d26a845df02b68c5b7c555cc8c6fea"
   },
   "familyID": "noxmanga-ptbr-v1",
   "icon": {
     "path": "modules/noxmanga-ptbr/icon.png",
-    "sha256": "PLACEHOLDER"
+    "sha256": "bcc5764becafd46793b96469a20e290dcc3cf9930ac2f71f6413c20f62a30c88"
   },
   "id": "noxmanga-ptbr-v1",
   "language": "pt-BR",
