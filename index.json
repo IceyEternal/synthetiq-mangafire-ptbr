@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-08-29T00:00:00Z",
+  "modules": [
+    {
+      "contentRating": "suggestive",
+      "contentType": "pageImages",
+      "familyID": "mangafire-ptbr-v1",
+      "icon": {
+        "path": "modules/mangafire-ptbr/icon.png",
+        "sha256": "bcc5764becafd46793b96469a20e290dcc3cf9930ac2f71f6413c20f62a30c88"
+      },
+      "id": "mangafire-ptbr-v1",
+      "language": "pt-BR",
+      "manifest": {
+        "path": "modules/mangafire-ptbr/manifest.json",
+        "sha256": "28421fe18e855367c91ac6640d401dbd06e6c2d2a54aacb3b60adc81c5b1f73a"
+      },
+      "name": "MangaFire PT-BR",
+      "releaseTrack": "beta",
+      "status": "active",
+      "version": "1.0.0",
+      "sortPriority": 1
+    }
+  ]
+}
