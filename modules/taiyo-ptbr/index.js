@@ -394,6 +394,20 @@
     return urls;
   }
 
+  function serializedChapterImages(html) {
+    const normalized = String(html || "").replace(/\\\"/g, "\"").replace(/\\"/g, "\"");
+    const markerIndex = normalized.indexOf("\"mediaChapter\":");
+    if (markerIndex < 0) return [];
+    const chunk = normalized.slice(markerIndex);
+    const chapterMatch = chunk.match(/\"mediaChapter\"\s*:\s*\{\s*\"id\"\s*:\s*\"([^\"]+)\"/i);
+    const mediaMatch = chunk.match(/\"media\"\s*:\s*\{\s*\"id\"\s*:\s*\"([^\"]+)\"/i);
+    const pagesMatch = chunk.match(/\"pages\"\s*:\s*\[([\s\S]*?)\]\s*,\s*\"previousChapter\"/i) || chunk.match(/\"pages\"\s*:\s*\[([\s\S]*?)\]/i);
+    if (!chapterMatch || !mediaMatch || !pagesMatch) return [];
+    const pageIDs = Array.from(pagesMatch[1].matchAll(/\"id\"\s*:\s*\"([^\"]+)\"/gi)).map((match) => match[1]);
+    if (!pageIDs.length) return [];
+    return pageIDs.map((pageID) => `${CDN_URL}/${mediaMatch[1]}/chapters/${chapterMatch[1]}/${pageID}.jpg`);
+  }
+
   async function extractImages(value) {
     const id = chapterID(value);
     const href = `${BASE_URL}/chapter/${id}/1`;
@@ -406,6 +420,7 @@
         .filter(Boolean)
         .map((pageId) => `${CDN_URL}/${embedded.media.id}/chapters/${embedded.id}/${pageId}.jpg`);
     }
+    if (!urls.length) urls = serializedChapterImages(html);
     if (!urls.length) urls = directChapterImages(html);
     if (!urls.length) throw new Error("Taiyō não devolveu as páginas deste capítulo.");
     return urls.map((url) => ({
