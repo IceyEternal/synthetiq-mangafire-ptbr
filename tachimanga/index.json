@@ -14,8 +14,7 @@
         "baseUrl": "https://mangafire.to",
         "versionId": 1
       }
-    ],
-    "nsfw": 1
+    ]
   },
   {
     "name": "Tachiyomi: MangaDex PT-BR",
@@ -32,8 +31,7 @@
         "baseUrl": "https://mangadex.org",
         "versionId": 1
       }
-    ],
-    "nsfw": 1
+    ]
   },
   {
     "name": "Tachiyomi: Niadd PT-BR",
@@ -50,8 +48,7 @@
         "baseUrl": "https://br.niadd.com",
         "versionId": 1
       }
-    ],
-    "nsfw": 1
+    ]
   },
   {
     "name": "Tachiyomi: NoxManga PT-BR",
@@ -68,8 +65,7 @@
         "baseUrl": "https://noxmangas.org",
         "versionId": 1
       }
-    ],
-    "nsfw": 1
+    ]
   },
   {
     "name": "Tachiyomi: Taiyō PT-BR",
@@ -86,7 +82,6 @@
         "baseUrl": "https://taiyo.moe",
         "versionId": 1
       }
-    ],
-    "nsfw": 1
+    ]
   }
 ]
