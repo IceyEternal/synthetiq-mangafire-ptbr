@@ -2,12 +2,12 @@
   "trees": {
     "mangafire": "d6a612e9f86262ff9b81d7975c38ff049d26780c",
     "mangadex": "2ab84e1dac0fdc9d4efdda25c28d94680db8adfd",
-    "niadd": "d832d01f1fe9a441c8b45b380c4df60ac5d6e46f",
+    "niadd": "09adc93ffc5387ba0adfa55e751d7e481057f2d6",
     "noxmanga": "f4e4a4410b214cd39075f9f88ef65b6d2ff14ed0",
-    "taiyo": "91d53963f3592b7f79dd1499efd4f0f70b4c2cbd",
-    "gradle": "ec056ad6cba7a3983997136956b9f13c80a76cee",
+    "taiyo": "457ab023df468b9a2fe82c67bc6f79d1dc0135e6",
+    "gradle": "d994e389974f097fd2bd6c4de4c2c13314d28cff",
     "common": "7eb548063545ab082aba3dc96aa4503f309ceeaf",
-    "core": "3bf241f8a8b68b452a634ff2c15399616652b665",
+    "core": "301366d26152ec042e0486fafb098bb67ccb2683",
     "compiler": "ed1bf0c1b7910167fb8f68e77355e578976e6b37",
     "i18n": "80590d1fab45d3a90856d93082db81fca7b6475f"
   }
