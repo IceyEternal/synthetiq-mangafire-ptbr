@@ -4,8 +4,8 @@
     "pkg": "eu.kanade.tachiyomi.extension.all.mangafireptbr",
     "apk": "MangaFire-PT-BR-Tachimanga.jar",
     "lang": "pt-BR",
-    "code": 106032,
-    "version": "1.6.32",
+    "code": 106033,
+    "version": "1.6.33",
     "sources": [
       {
         "name": "MangaFire PT-BR",
