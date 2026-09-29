@@ -38,8 +38,8 @@
     "pkg": "eu.kanade.tachiyomi.extension.all.niaddptbr",
     "apk": "Niadd-PT-BR-Tachimanga.jar",
     "lang": "pt-BR",
-    "code": 104002,
-    "version": "1.4.2",
+    "code": 106000,
+    "version": "1.6.0",
     "sources": [
       {
         "name": "Niadd PT-BR",
