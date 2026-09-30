@@ -38,8 +38,8 @@
     "pkg": "eu.kanade.tachiyomi.extension.all.niaddptbr",
     "apk": "Niadd-PT-BR-Tachimanga.jar",
     "lang": "pt-BR",
-    "code": 106000,
-    "version": "1.6.0",
+    "code": 106001,
+    "version": "1.6.1",
     "sources": [
       {
         "name": "Niadd PT-BR",
@@ -72,8 +72,8 @@
     "pkg": "eu.kanade.tachiyomi.extension.pt.taiyoptbr",
     "apk": "Taiyo-PT-BR-Tachimanga.jar",
     "lang": "pt-BR",
-    "code": 104011,
-    "version": "1.4.11",
+    "code": 106000,
+    "version": "1.6.0",
     "sources": [
       {
         "name": "Taiyō PT-BR",
