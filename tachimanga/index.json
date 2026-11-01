@@ -4,8 +4,8 @@
     "pkg": "eu.kanade.tachiyomi.extension.all.mangafireptbr",
     "apk": "MangaFire-PT-BR-Tachimanga.jar",
     "lang": "pt-BR",
-    "code": 106035,
-    "version": "1.6.35",
+    "code": 106036,
+    "version": "1.6.36",
     "sources": [
       {
         "name": "MangaFire PT-BR",
@@ -21,8 +21,8 @@
     "pkg": "eu.kanade.tachiyomi.extension.all.mangadexptbr",
     "apk": "MangaDex-PT-BR-Tachimanga.jar",
     "lang": "pt-BR",
-    "code": 106000,
-    "version": "1.6.0",
+    "code": 106001,
+    "version": "1.6.1",
     "sources": [
       {
         "name": "MangaDex PT-BR",
@@ -38,8 +38,8 @@
     "pkg": "eu.kanade.tachiyomi.extension.all.niaddptbr",
     "apk": "Niadd-PT-BR-Tachimanga.jar",
     "lang": "pt-BR",
-    "code": 106001,
-    "version": "1.6.1",
+    "code": 106002,
+    "version": "1.6.2",
     "sources": [
       {
         "name": "Niadd PT-BR",
@@ -55,8 +55,8 @@
     "pkg": "eu.kanade.tachiyomi.extension.pt.noxmangaptbr",
     "apk": "NoxManga-PT-BR-Tachimanga.jar",
     "lang": "pt-BR",
-    "code": 106055,
-    "version": "1.6.55",
+    "code": 106056,
+    "version": "1.6.56",
     "sources": [
       {
         "name": "NoxManga PT-BR",
@@ -72,8 +72,8 @@
     "pkg": "eu.kanade.tachiyomi.extension.pt.taiyoptbr",
     "apk": "Taiyo-PT-BR-Tachimanga.jar",
     "lang": "pt-BR",
-    "code": 106000,
-    "version": "1.6.0",
+    "code": 106001,
+    "version": "1.6.1",
     "sources": [
       {
         "name": "Taiyō PT-BR",
