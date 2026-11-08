@@ -21,8 +21,8 @@
     "pkg": "eu.kanade.tachiyomi.extension.all.mangadexptbr",
     "apk": "MangaDex-PT-BR-Tachimanga.jar",
     "lang": "pt-BR",
-    "code": 106002,
-    "version": "1.6.2",
+    "code": 106003,
+    "version": "1.6.3",
     "sources": [
       {
         "name": "MangaDex PT-BR",
