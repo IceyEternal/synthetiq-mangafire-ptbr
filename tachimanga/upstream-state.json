@@ -1,13 +1,13 @@
 {
   "trees": {
-    "mangafire": "edf2f5cc904be9387ccdc3af88af345f59db525d",
-    "mangadex": "9feec09f85718fa11a39a1f982c59ad3d1ad4d4d",
-    "niadd": "354ec4136dda64824132da8bacd1146c374df6a4",
-    "noxmanga": "e6f8bd0cf974faea417509fa7b2474c7c18962d2",
-    "taiyo": "87b420fead922f2fe53b805eb2baff5e46382a19",
-    "gradle": "c6ef5e70a6b565820d8e047a76262b1333b741a4",
+    "mangafire": "52e19657e7f3cd9d48ad863d6f9ce34163087fa9",
+    "mangadex": "e0943e1c69e6bd0d923b4325b2f951c3b5c95928",
+    "niadd": "5f102ce4d1e66e9e05a6d8b82617a5a274bedb7b",
+    "noxmanga": "7e896f7c8205496db48f57ba3ee82e68014dd1a6",
+    "taiyo": "efff335f54df4614fadc1af7f6198b0281fb995b",
+    "gradle": "bd42ef43464f1d55bdcc27485500b05c25223cff",
     "common": "97253ad0d23562405670baedad52b987480b8b8e",
-    "core": "c828857caede87d54d00ba6fb40e81186afdb2b6",
+    "core": "6f25849bd08427c16ca4cbb55e12a9615e943579",
     "compiler": "01fc2ac4764e5d5e3d84b4c4a83d6014d16159f5",
     "i18n": "80590d1fab45d3a90856d93082db81fca7b6475f"
   }
